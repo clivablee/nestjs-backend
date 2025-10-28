@@ -6,3 +6,7 @@ export class createUser {
   middle_name: string;
   last_name: string;
 }
+
+export interface UpdateUser{
+  department?: string
+}

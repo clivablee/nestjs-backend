@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('employee_information') // 👈 matches your MySQL table name
+@Entity('employee_information') // matches MySQL table name
 export class Employees {
   @PrimaryGeneratedColumn()
   id: number;

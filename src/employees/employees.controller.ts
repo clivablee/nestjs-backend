@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { error } from 'console';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Controller('employees')
 export class EmployeesController {
@@ -15,6 +15,14 @@ export class EmployeesController {
         }
     }
 
+    @Get(':emp_id')
+    async getEmployeeById(@Param('emp_id', ParseIntPipe) emp_id: number) {
+        const response = await this.employeesService.fetchbyEmpId(emp_id)
+        console.log("response", response);
+        if (!response || response.length === 0) throw new HttpException("User not found", HttpStatus.BAD_REQUEST);
+        return response
+    }
+    
     @Post('create-user')
     async createUser(@Body() userDetails: CreateEmployeeDto) {
         const middleInitial = userDetails.middle_name.charAt(0).toUpperCase()
@@ -28,12 +36,13 @@ export class EmployeesController {
         }
     }
 
-    @Get(':emp_id')
-    async getEmployeeById(@Param('emp_id', ParseIntPipe) emp_id: number) {
-        const response = await this.employeesService.fetchbyEmpId(emp_id)
-        console.log("response", response);
-        if (!response || response.length === 0) throw new HttpException("User not found", HttpStatus.BAD_REQUEST);
+
+    @Put(':emp_id')
+    async updateEmployeeById(
+        @Param('emp_id', ParseIntPipe) emp_id: number,
+        @Body() updateData: UpdateEmployeeDto
+    ) {
+        const response = await this.employeesService.updateEmployee(emp_id, updateData)
         return response
     }
-
 }
