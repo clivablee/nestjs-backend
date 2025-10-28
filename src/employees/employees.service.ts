@@ -46,9 +46,33 @@ export class EmployeesService {
       if (!record) {
         throw new HttpException('No record found', HttpStatus.NOT_FOUND);
       }
+
+      const hasUpdateName =
+        userDetails.first_name?.trim() ||
+        userDetails.middle_name?.trim() ||
+        userDetails.last_name?.trim();
+
+      if (hasUpdateName) {
+        const first_name = userDetails.first_name
+          ? userDetails.first_name
+          : record.first_name;
+        const middle_name = userDetails.middle_name
+          ? userDetails.middle_name
+          : record.middle_name;
+        const last_name = userDetails.last_name
+          ? userDetails.last_name
+          : record.last_name;
+        
+        const middleInitial = middle_name.trim() ? `${middle_name.charAt(0).toUpperCase()}.`: '';
+        //(e.g. Dela Cruz, Juan M.)
+        const employee_name = `${last_name}, ${first_name} ${middleInitial}`
+
+        userDetails.employee_name = employee_name;
+      }
+
       const sample = await this.employeeRepository.update(
         { emp_id: emp_id },
-        { department: userDetails.department },
+        userDetails,
       );
       console.log('sample', sample);
       const updatedRecord = await this.employeeRepository.findOneBy({ emp_id });
@@ -68,5 +92,28 @@ export class EmployeesService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async deleteEmployee(emp_id: number) {
+    try {
+      const record = await this.employeeRepository.findOneBy({ emp_id: emp_id })
+      if(!record){
+        throw new HttpException('No record found', HttpStatus.NOT_FOUND);
+      }
+      const data = await this.employeeRepository.delete({ emp_id: emp_id });
+      return {
+        data
+      };
+      
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        `Failed to delete employee: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    
   }
 }

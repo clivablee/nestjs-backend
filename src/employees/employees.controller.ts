@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseI
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { RESPONSE_PASSTHROUGH_METADATA } from '@nestjs/common/constants';
 
 @Controller('employees')
 export class EmployeesController {
@@ -36,7 +37,6 @@ export class EmployeesController {
         }
     }
 
-
     @Put(':emp_id')
     async updateEmployeeById(
         @Param('emp_id', ParseIntPipe) emp_id: number,
@@ -44,5 +44,13 @@ export class EmployeesController {
     ) {
         const response = await this.employeesService.updateEmployee(emp_id, updateData)
         return response
+    }
+
+    @Delete(':emp_id')
+    async deleteEmployee(
+        @Param('emp_id', ParseIntPipe) emp_id: number,
+    ) {
+        const response = await this.employeesService.deleteEmployee(emp_id)
+        if (response.data.affected !== 0) return { message: "Deleted successfully" }
     }
 }

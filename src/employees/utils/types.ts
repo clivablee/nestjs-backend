@@ -9,4 +9,8 @@ export class createUser {
 
 export interface UpdateUser{
   department?: string
+  first_name?: string
+  middle_name?: string
+  last_name?: string
+  employee_name?: string
 }

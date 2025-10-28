@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   isNotEmpty,
   IsNotEmpty,
@@ -12,12 +13,14 @@ export class CreateEmployeeDto {
   @IsNumber()
   emp_id: number;
 
+  @Transform(({ value }) => value?.trim())
   @IsNotEmpty()
   first_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   middle_name: string;
 
+  @Transform(({ value }) => value?.trim())
   @IsNotEmpty()
   last_name: string;
 
