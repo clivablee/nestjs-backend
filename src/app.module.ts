@@ -6,12 +6,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesController } from './employees/employees.controller';
 import { EmployeesModule } from './employees/employees.module';
 import { Employees } from './employees/entities/employees';
-import { configDotenv } from 'dotenv';
-
-configDotenv();
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    //for env to be accessible everywhere
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -23,7 +26,8 @@ configDotenv();
       synchronize: true,
     }),
     UsersModule,
-    EmployeesModule
+    EmployeesModule,
+    AuthModule,
   ],
   controllers: [RecordsController],
   providers: [RecordsService],

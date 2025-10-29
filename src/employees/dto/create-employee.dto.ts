@@ -1,12 +1,9 @@
 import { Transform } from 'class-transformer';
 import {
-  isNotEmpty,
   IsNotEmpty,
-  isNumber,
   IsNumber,
   IsOptional,
   IsString,
-  isString,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
