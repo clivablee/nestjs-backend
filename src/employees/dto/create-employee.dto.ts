@@ -24,4 +24,15 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   @IsString()
   department: string;
+
+  @IsNotEmpty()
+  @IsString()
+  income_type: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  salary: number
+
+  @IsOptional()
+  date_of_birth: string
 }

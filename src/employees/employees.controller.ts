@@ -26,15 +26,8 @@ export class EmployeesController {
     
     @Post('create-user')
     async createUser(@Body() userDetails: CreateEmployeeDto) {
-        const middleInitial = userDetails.middle_name.charAt(0).toUpperCase()
-        const employee_name = `${userDetails.last_name}, ${userDetails.first_name} ${middleInitial}.`
-        const newData = { ...userDetails, employee_name }
-        const response = await this.employeesService.createEmployee(newData);
-        if (!response) throw new HttpException("User already exists", HttpStatus.BAD_REQUEST);
-        return {
-            message: "Successfully added",
-            data: response,
-        }
+        const response = await this.employeesService.createEmployee(userDetails)
+        return response
     }
 
     @Put(':emp_id')

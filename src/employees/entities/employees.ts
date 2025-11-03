@@ -131,7 +131,7 @@ export class Employees {
   @Column({ length: 255, nullable: true })
   separation_cause: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 255, nullable: true, default: "1900-12-31" })
   separation_date: string;
 
   @Column({ length: 45, nullable: true })

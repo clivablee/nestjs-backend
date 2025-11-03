@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Employees } from './entities/employees';
 import { LessThan, Like, MoreThan, Repository } from 'typeorm';
 import { createUser, UpdateUser } from './utils/types';
+import { getEmployeeRates, getFullName } from './utils/general.util';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeesService {
@@ -34,46 +37,64 @@ export class EmployeesService {
     return data;
   }
 
-  async createEmployee(userDetails: createUser) {
-    return await this.employeeRepository.save(userDetails);
+  async createEmployee(userDetails: CreateEmployeeDto) {
+    const employee_name = getFullName(
+      userDetails.first_name,
+      userDetails.last_name,
+      userDetails.middle_name,
+    );
+    const rates = getEmployeeRates(userDetails.income_type, userDetails.salary);
+    const newData = {
+      ...userDetails,
+      employee_name,
+      basic_salary: rates.basic_salary,
+      daily_rate: rates.daily_rate,
+      hourly_rate: rates.hourly_rate,
+      minute_rate: rates.minute_rate,
+    };
+    const isExist = await this.employeeRepository.findOneBy({
+      emp_id: userDetails.emp_id,
+    });
+    if (isExist) {
+      throw new HttpException(
+        'Employee id already exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return await this.employeeRepository.save(newData);
   }
 
-  async updateEmployee(emp_id: number, userDetails: UpdateUser) {
+  async updateEmployee(emp_id: number, userDetails: UpdateEmployeeDto) {
     try {
-      const record = await this.employeeRepository.findOneBy({
+      const hasRecord = await this.employeeRepository.findOneBy({
         emp_id: emp_id,
       });
-      if (!record) {
+      if (!hasRecord) {
         throw new HttpException('No record found', HttpStatus.NOT_FOUND);
       }
 
-      const hasUpdateName =
-        userDetails.first_name?.trim() ||
-        userDetails.middle_name?.trim() ||
-        userDetails.last_name?.trim();
+      const first_name = userDetails.first_name ?? hasRecord.first_name;
+      const middle_name = userDetails.middle_name ?? hasRecord.middle_name;
+      const last_name = userDetails.last_name ?? hasRecord.last_name;
+      const income_type = userDetails.income_type ?? hasRecord.income_type;
+      const salary = userDetails.salary ?? hasRecord.salary;
+      const rates = getEmployeeRates(income_type, salary);
+      const employee_name = getFullName(first_name, last_name, middle_name);
 
-      if (hasUpdateName) {
-        const first_name = userDetails.first_name
-          ? userDetails.first_name
-          : record.first_name;
-        const middle_name = userDetails.middle_name
-          ? userDetails.middle_name
-          : record.middle_name;
-        const last_name = userDetails.last_name
-          ? userDetails.last_name
-          : record.last_name;
-        
-        const middleInitial = middle_name.trim() ? `${middle_name.charAt(0).toUpperCase()}.`: '';
-        //(e.g. Dela Cruz, Juan M.)
-        const employee_name = `${last_name}, ${first_name} ${middleInitial}`
-
-        userDetails.employee_name = employee_name;
-      }
+      const newData = {
+        ...userDetails,
+        employee_name,
+        basic_salary: rates.basic_salary,
+        daily_rate: rates.daily_rate,
+        hourly_rate: rates.hourly_rate,
+        minute_rate: rates.minute_rate,
+      };
 
       const sample = await this.employeeRepository.update(
         { emp_id: emp_id },
-        userDetails,
+        newData,
       );
+
       console.log('sample', sample);
       const updatedRecord = await this.employeeRepository.findOneBy({ emp_id });
       return {
@@ -96,15 +117,16 @@ export class EmployeesService {
 
   async deleteEmployee(emp_id: number) {
     try {
-      const record = await this.employeeRepository.findOneBy({ emp_id: emp_id })
-      if(!record){
+      const record = await this.employeeRepository.findOneBy({
+        emp_id: emp_id,
+      });
+      if (!record) {
         throw new HttpException('No record found', HttpStatus.NOT_FOUND);
       }
       const data = await this.employeeRepository.delete({ emp_id: emp_id });
       return {
-        data
+        data,
       };
-      
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -114,6 +136,5 @@ export class EmployeesService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    
   }
 }
