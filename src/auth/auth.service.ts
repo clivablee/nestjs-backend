@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Employees } from 'src/employees/entities/employees';
 import { Repository } from 'typeorm';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { find } from 'rxjs';
+import { find, first } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -27,8 +27,12 @@ export class AuthService {
         );
       }
       return {
+        employee_name: findUser.employee_name,
         emp_id: findUser.emp_id,
         email_work: findUser.email_work,
+        job_title: findUser.job_title,
+        first_name: findUser.first_name,
+        access_rights: findUser.access_rights
       };
     } catch (error) {
       if (error instanceof HttpException) {
@@ -44,12 +48,20 @@ export class AuthService {
 
   async login(user: any) {
     console.log('[4] SIGNIN TOKEN: ', user);
-    const payload = { emp_id: user.emp_id, email_work: user.email_work };
+    const payload = {
+      emp_id: user.emp_id,
+      email_work: user.email_work,
+    };
     const token = this.jwtService.sign(payload);
     return {
-      emp_id: payload.emp_id,
-      email_work: payload.email_work,
-      access_token: token,
+      data: {
+        employee_name: user.employee_name,
+        first_name: user.first_name,
+        emp_id: payload.emp_id,
+        job_title: user.job_title,
+        access_rights: user.access_rights,
+        token: token,
+      },
     };
   }
 }

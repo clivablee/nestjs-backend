@@ -5,7 +5,7 @@ import { LocalGuard } from './guards/local.guard';
 import type { Request } from 'express';
 import { JwtGuard } from './guards/jwt.guard';
 
-@Controller('auth')
+@Controller('')
 export class AuthController {
   constructor(private authService: AuthService) { }
   
@@ -22,6 +22,5 @@ export class AuthController {
     console.log("[6] PROTECTED CONTROLLER: ", req.user)
     req.user
   }
-
 
 }
