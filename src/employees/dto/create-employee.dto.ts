@@ -1,10 +1,5 @@
 import { Transform } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateEmployeeDto {
   @IsNumber()
@@ -27,12 +22,20 @@ export class CreateEmployeeDto {
 
   @IsNotEmpty()
   @IsString()
-  income_type: string
+  income_type: string;
 
   @IsNotEmpty()
   @IsNumber()
-  salary: number
+  salary: number;
 
   @IsOptional()
-  date_of_birth: string
+  date_of_birth: string;
+
+  @IsNotEmpty()
+  @IsString()
+  email_work: string;
+
+  @IsOptional()
+  @IsString()
+  password: string;
 }

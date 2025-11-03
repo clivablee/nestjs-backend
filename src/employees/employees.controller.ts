@@ -46,4 +46,6 @@ export class EmployeesController {
         const response = await this.employeesService.deleteEmployee(emp_id)
         if (response.data.affected !== 0) return { message: "Deleted successfully" }
     }
+
+    
 }

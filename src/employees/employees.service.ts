@@ -17,7 +17,7 @@ export class EmployeesService {
   async fetchAllEmployees() {
     return await this.employeeRepository.find({
       select: ['emp_id', 'employee_name', 'department', 'salary'],
-      where: { income_type: 'Monthly' },
+      // where: { income_type: 'Monthly' },
     });
   }
 
@@ -90,12 +90,10 @@ export class EmployeesService {
         minute_rate: rates.minute_rate,
       };
 
-      const sample = await this.employeeRepository.update(
-        { emp_id: emp_id },
-        newData,
-      );
 
-      console.log('sample', sample);
+      //perform db update
+      await this.employeeRepository.update({ emp_id: emp_id }, newData);
+
       const updatedRecord = await this.employeeRepository.findOneBy({ emp_id });
       return {
         data: {

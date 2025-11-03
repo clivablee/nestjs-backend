@@ -125,7 +125,7 @@ export class Employees {
   @Column({ length: 255, nullable: true })
   access_rights: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 255, nullable: true, default: "123" })
   password: string;
 
   @Column({ length: 255, nullable: true })
